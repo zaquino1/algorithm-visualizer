@@ -1,153 +1,141 @@
 package org.algovisualizer.ui;
 
 import org.algovisualizer.controller.AlgorithmController;
+import org.algovisualizer.model.AlgorithmState;
 import org.algovisualizer.model.AlgorithmType;
+import org.algovisualizer.observer.AlgorithmObserver;
+
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Control panel for user interactions.
- * Provides controls for algorithm execution, speed adjustment, and array generation.
- */
-public class ControlPanel extends JPanel {
+public class ControlPanel extends JPanel implements AlgorithmObserver {
     private final AlgorithmController controller;
-    private final VisualizationPanel visualizationPanel;
+    private final String category;
     private JComboBox<AlgorithmType> algorithmSelector;
-    private JSpinner arraySizeSpinner;
     private JSlider speedSlider;
-    private JButton runButton;
-    private JButton stepButton;
-    private JButton resetButton;
-    private JButton generateButton;
-    private JTextField customArrayField;
+    private JTextArea customDataArea;
+    private JButton playButton, pauseButton, stepForwardButton, stepBackButton, resetButton, generateButton, customDataButton;
 
-    public ControlPanel(AlgorithmController controller, VisualizationPanel visualizationPanel) {
+    public ControlPanel(AlgorithmController controller, AlgorithmType[] availableAlgorithms, String category) {
         this.controller = controller;
-        this.visualizationPanel = visualizationPanel;
-        initializeUI();
+        this.category = category;
+        initializeUI(availableAlgorithms);
     }
 
-    private void initializeUI() {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        setPreferredSize(new Dimension(300, 0));
+    private void initializeUI(AlgorithmType[] availableAlgorithms) {
+        setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        GridBagConstraints gbc = new GridBagConstraints();
 
-        add(createAlgorithmSection());
-        add(Box.createRigidArea(new Dimension(0, 20)));
-        add(createArraySection());
-        add(Box.createRigidArea(new Dimension(0, 20)));
-        add(createControlSection());
-        add(Box.createRigidArea(new Dimension(0, 20)));
-        add(createSpeedSection());
+        gbc.weightx = 0.33;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        add(createLeftPanel(availableAlgorithms), gbc);
+
+        gbc.weightx = 0.34;
+        gbc.gridx = 1;
+        add(createCenterPanel(), gbc);
+
+        gbc.weightx = 0.33;
+        gbc.gridx = 2;
+        add(createRightPanel(), gbc);
     }
 
-    private JPanel createAlgorithmSection() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createTitledBorder("Algorithm Selection"));
-
-        algorithmSelector = new JComboBox<>(AlgorithmType.values());
-        algorithmSelector.addActionListener(e ->
-                controller.setAlgorithm((AlgorithmType) algorithmSelector.getSelectedItem()));
-
+    private JPanel createLeftPanel(AlgorithmType[] availableAlgorithms) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel.add(new JLabel("Algorithm:"));
+        algorithmSelector = new JComboBox<>(availableAlgorithms);
+        algorithmSelector.addActionListener(e -> {
+            AlgorithmType selectedType = (AlgorithmType) algorithmSelector.getSelectedItem();
+            if (selectedType != null) {
+                controller.setAlgorithm(selectedType);
+            }
+        });
         panel.add(algorithmSelector);
         return panel;
     }
 
-    private JPanel createArraySection() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createTitledBorder("Array Configuration"));
+    private JPanel createCenterPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        stepBackButton = new JButton("<<");
+        stepBackButton.setToolTipText("Step Backward");
+        stepBackButton.addActionListener(e -> controller.stepBack());
 
-        // Array size
-        JPanel sizePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        sizePanel.add(new JLabel("Size:"));
-        arraySizeSpinner = new JSpinner(new SpinnerNumberModel(20, 5, 100, 5));
-        sizePanel.add(arraySizeSpinner);
+        playButton = new JButton("Play");
+        playButton.addActionListener(e -> controller.play());
 
-        generateButton = new JButton("Generate Random Array");
-        generateButton.addActionListener(e -> generateRandomArray());
+        pauseButton = new JButton("Pause");
+        pauseButton.addActionListener(e -> controller.pause());
 
-        // Custom array input
-        JPanel customPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        customPanel.add(new JLabel("Custom:"));
-        customArrayField = new JTextField(15);
-        customArrayField.setToolTipText("Enter comma-separated values");
-        customPanel.add(customArrayField);
-
-        JButton customButton = new JButton("Use Custom");
-        customButton.addActionListener(e -> useCustomArray());
-
-        panel.add(sizePanel);
-        panel.add(generateButton);
-        panel.add(customPanel);
-        panel.add(customButton);
-
-        return panel;
-    }
-
-    private JPanel createControlSection() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createTitledBorder("Execution Controls"));
-
-        runButton = new JButton("Run");
-        runButton.addActionListener(e -> controller.run());
-
-        stepButton = new JButton("Step");
-        stepButton.addActionListener(e -> controller.step());
+        stepForwardButton = new JButton(">>");
+        stepForwardButton.setToolTipText("Step Forward");
+        stepForwardButton.addActionListener(e -> controller.stepForward());
 
         resetButton = new JButton("Reset");
         resetButton.addActionListener(e -> controller.reset());
 
-        panel.add(runButton);
-        panel.add(Box.createRigidArea(new Dimension(0, 5)));
-        panel.add(stepButton);
-        panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        panel.add(stepBackButton);
+        panel.add(playButton);
+        panel.add(pauseButton);
+        panel.add(stepForwardButton);
+        panel.add(new JSeparator(SwingConstants.VERTICAL));
         panel.add(resetButton);
-
         return panel;
     }
 
-    private JPanel createSpeedSection() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createTitledBorder("Animation Speed"));
+    private JPanel createRightPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        
+        customDataArea = new JTextArea(2, 20);
+        setCustomDataPlaceholder();
+        panel.add(new JScrollPane(customDataArea));
+        customDataButton = new JButton("Use Custom");
+        customDataButton.addActionListener(e -> controller.setCustomData(customDataArea.getText()));
+        panel.add(customDataButton);
 
+        generateButton = new JButton("Generate");
+        generateButton.addActionListener(e -> controller.generateRandomData());
+        panel.add(generateButton);
+
+        panel.add(new JLabel("Speed:"));
         speedSlider = new JSlider(1, 100, 50);
-        speedSlider.setMajorTickSpacing(25);
-        speedSlider.setPaintTicks(true);
-        speedSlider.setPaintLabels(true);
         speedSlider.addChangeListener(e -> controller.setSpeed(speedSlider.getValue()));
-
-        panel.add(new JLabel("Slower ← → Faster"));
         panel.add(speedSlider);
-
         return panel;
     }
 
-    private void generateRandomArray() {
-        int size = (Integer) arraySizeSpinner.getValue();
-        controller.generateRandomArray(size);
+    private void setCustomDataPlaceholder() {
+        switch (category) {
+            case "Sorting":
+            case "Searching":
+                customDataArea.setText("e.g., 4,2,7,1,5");
+                break;
+            case "Tree":
+                customDataArea.setText("e.g., 50,30,70,20,40,60,80");
+                break;
+            case "Graph":
+                customDataArea.setText("Custom graph input not yet supported.");
+                customDataArea.setEditable(false);
+                break;
+            default:
+                customDataArea.setText("");
+        }
     }
 
-    private void useCustomArray() {
-        String input = customArrayField.getText().trim();
-        if (input.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter comma-separated values");
-            return;
+    @Override
+    public void onStateUpdate(AlgorithmState state) {
+        if (state.getAlgorithmType() != null && algorithmSelector.getSelectedItem() != state.getAlgorithmType()) {
+            algorithmSelector.setSelectedItem(state.getAlgorithmType());
         }
-
-        try {
-            String[] parts = input.split(",");
-            int[] array = new int[parts.length];
-            for (int i = 0; i < parts.length; i++) {
-                array[i] = Integer.parseInt(parts[i].trim());
-            }
-            controller.setArray(array);
-            customArrayField.setText("");
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Invalid input. Use comma-separated integers.");
-        }
+        boolean isPlaying = state.isPlaying();
+        playButton.setEnabled(!isPlaying);
+        pauseButton.setEnabled(isPlaying);
+        stepBackButton.setEnabled(!isPlaying);
+        stepForwardButton.setEnabled(!isPlaying);
+        resetButton.setEnabled(!isPlaying);
+        algorithmSelector.setEnabled(!isPlaying);
+        customDataButton.setEnabled(!isPlaying);
+        generateButton.setEnabled(!isPlaying);
     }
 }

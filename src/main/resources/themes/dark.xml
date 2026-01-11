@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<RSyntaxTheme version="1.0">
+    <base href="default"/>
+    <background color="2B2B2B"/>
+    <caret color="FFFFFF"/>
+    <selection bg="4A4A4A" fg="FFFFFF"/>
+    <gutterBorder color="3C3F41"/>
+    <lineNumbers color="888888"/>
+    <marginLine color="3C3F41"/>
+    <style token="IDENTIFIER" fg="A9B7C6"/>
+    <style token="RESERVED_WORD" fg="CC7832" bold="true"/>
+    <style token="RESERVED_WORD_2" fg="CC7832" bold="true"/>
+    <style token="DATA_TYPE" fg="CC7832" bold="true"/>
+    <style token="LITERAL_BOOLEAN" fg="CC7832" bold="true"/>
+    <style token="LITERAL_NUMBER_DECIMAL_INT" fg="6897BB"/>
+    <style token="LITERAL_STRING_DOUBLE_QUOTE" fg="6A8759"/>
+    <style token="COMMENT_EOL" fg="808080" italic="true"/>
+    <style token="COMMENT_MULTILINE" fg="808080" italic="true"/>
+    <style token="OPERATOR" fg="A9B7C6"/>
+    <style token="SEPARATOR" fg="A9B7C6"/>
+    <style token="WHITESPACE" fg="A9B7C6"/>
+    <style token="FUNCTION" fg="FFC66D"/>
+    <style token="ANNOTATION" fg="BBB529"/>
+</RSyntaxTheme>

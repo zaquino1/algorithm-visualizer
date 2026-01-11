@@ -6,8 +6,9 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Panel displaying algorithm performance statistics.
- * Shows comparisons, swaps, time complexity, and execution time.
+ * A panel for displaying algorithm statistics.
+ * Note: This panel is currently not in use as stats are displayed in the InfoPanel.
+ * It is kept for potential future use and to prevent compilation errors.
  */
 public class StatsPanel extends JPanel implements AlgorithmObserver {
     private JLabel comparisonsLabel;
@@ -37,8 +38,7 @@ public class StatsPanel extends JPanel implements AlgorithmObserver {
 
     private JLabel createStatLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("Arial", Font.BOLD, 14));
-        label.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        label.setFont(new Font("SansSerif", Font.BOLD, 14));
         label.setHorizontalAlignment(SwingConstants.CENTER);
         return label;
     }
